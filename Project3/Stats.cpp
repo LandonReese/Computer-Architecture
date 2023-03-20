@@ -18,6 +18,23 @@
   * jr reads a register, jal writes to one.  
   * The provided trap code also accesses registers, 
   * see the handout for more info if you can't decipher it from the code.
+  * 
+  * Notes:
+  * enum PIPESTAGE { IF1 = 0, IF2 = 1, ID = 2, EXE1 = 3, EXE2 = 4, MEM1 = 5, 
+  *                  MEM2 = 6, WB = 7, PIPESTAGES = 8 };
+  * 
+  * Here are the variables defined within Stats.h
+  * 
+  * long long cycles;
+  * int flushes;
+  * int bubbles;
+  *
+  * int memops;
+  * int branches;
+  * int taken;
+  *
+  * int resultReg[PIPESTAGES];
+  * 
  ******************************/
 #include "Stats.h"
 
@@ -55,7 +72,10 @@ void Stats::registerDest(int r) { // r == the register to be written to
 }
 
 void Stats::flush(int count) { // count == how many ops to flush
-
+  // for(int i = 0; i < count; i++){
+  //   //flush all pipe stages
+  // }
+  // //increment flushes
 }
 
 
