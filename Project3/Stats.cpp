@@ -1,5 +1,5 @@
 /******************************
- * Submitted by: enter your first and last name and net ID
+ * Submitted by: Landon Reese LJR69
  * CS 3339 - Spring 2022, Texas State University
  * Project 3 Pipelining
  * Copyright 2022, Lee B. Hinkle, all rights reserved
@@ -38,15 +38,20 @@ void Stats::clock() {
 }
 
 void Stats::registerSrc(int r) { // r == the register being read
+
 }
 
 void Stats::registerDest(int r) { // r == the register to be written to
+
 }
 
 void Stats::flush(int count) { // count == how many ops to flush
+
 }
 
+
 void Stats::bubble() {
+
 }
 
 void Stats::showPipe() {
