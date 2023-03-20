@@ -10,6 +10,15 @@
  * Texas State University.
  ******************************/
  
+ /******************************
+  * Hints:
+  * A few other reminders 
+  * - sw uses the contents of two registers.   
+  * REG_HILO needs to be used whenever an instruction accesses hi or lo.  
+  * jr reads a register, jal writes to one.  
+  * The provided trap code also accesses registers, 
+  * see the handout for more info if you can't decipher it from the code.
+ ******************************/
 #include "Stats.h"
 
 Stats::Stats() {
