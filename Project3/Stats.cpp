@@ -35,6 +35,27 @@
   *
   * int resultReg[PIPESTAGES];
   * 
+  * 
+  * Oddball instructions in CPU
+  * sw - storeData = ??? so you need a stats call there
+  * stats.registerSrc
+  * 
+  * beq/bne
+  * stats....src, stats....src
+  * if(________ == __________)
+  * jumps branch stats don't change
+  * need flushes if branch not taken
+  *  
+  * Never a hazard with register 0, $0
+  * but still, registerSrc check for regZero
+  * 
+  * hi lo?
+  * They are a bit different because they are the same register.
+  * If you do alu source = high
+  * REG_HILO
+  * pass reghilo to stats
+  * s
+  * 
  ******************************/
 #include "Stats.h"
 
@@ -52,6 +73,7 @@ Stats::Stats() {
   }
 }
 
+//if you copy clock code, make sure you also use cycles++ because they will increment during a flush
 void Stats::clock() {
   cycles++;
 
@@ -72,14 +94,25 @@ void Stats::registerDest(int r) { // r == the register to be written to
 }
 
 void Stats::flush(int count) { // count == how many ops to flush
+  // a flush advances the entire pipeline, does not clear
   // for(int i = 0; i < count; i++){
   //   //flush all pipe stages
   // }
   // //increment flushes
+
+  // loop count times {
+  //   advance pipeline 1 cycle
+  // }
+  // 
 }
 
 
 void Stats::bubble() {
+  // in a bubble IF1 IF2 and IFD are frozen.
+  // We advance from EXE1 and Beyond.
+  // Advance the pipe, until instructions in IF1 or IF2 are ready to go!
+
+  // Common problem, you wrote something in ID that got transferred forward instead of frozen
 
 }
 
