@@ -86,11 +86,23 @@ void Stats::clock() {
 }
 
 void Stats::registerSrc(int r) { // r == the register being read
-
+  // When selecting the register, we need to make sure that there won't be a hazard
+  int totalBubbles = 0;
+  for(int i = EXE1; i < WB; i++){
+    //registerSrc check for regZero, r != 0
+    if(resultReg[i] == r && r != 0){ //checks to see if the register is being used for instructions in EXE1 -> WB
+      // If it is being used, insert the appropriate amount of bubbles to get the instruction out of the pipe
+      totalBubbles = WB - i;
+      for(int j = 0; j < totalBubbles; j++){
+        totalBubbles--;
+        bubble();
+      }
+    }
+  }
 }
 
 void Stats::registerDest(int r) { // r == the register to be written to
-
+  resultReg[ID] = r;
 }
 
 void Stats::flush(int count) { // count == how many ops to flush
@@ -104,6 +116,10 @@ void Stats::flush(int count) { // count == how many ops to flush
   //   advance pipeline 1 cycle
   // }
   // 
+  while(count > 0){
+    clock();        // Everytime a clock cycle is advanced,
+    flushes++;      // a flush is added.
+  }
 }
 
 
@@ -111,9 +127,15 @@ void Stats::bubble() {
   // in a bubble IF1 IF2 and IFD are frozen.
   // We advance from EXE1 and Beyond.
   // Advance the pipe, until instructions in IF1 or IF2 are ready to go!
-
   // Common problem, you wrote something in ID that got transferred forward instead of frozen
+  bubbles++;                    // increment bubbles
+  cycles++;                     // Need to advance one cycle to begin, then add into ID?
 
+  // Cycle backwards through the pipe, advancing until instruction in ID can begin
+  for(int i = WB; i > EXE1; i--){ // Advances through the pipe backwards, updating each stage.
+    resultReg[i] = resultReg[i-1];
+  }
+  resultReg[EXE1] = -1; //Because a bubble is necessary, add a NOP
 }
 
 void Stats::showPipe() {
