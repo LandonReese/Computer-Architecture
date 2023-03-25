@@ -1,0 +1,41 @@
+#!/bin/bash
+# P3 submission validation script - tests tar, compile, and sssp.mips output
+# Lee B. Hinkle, Texas State University
+# Instructions - run this on zeus.cs.txstate.edu
+#   make a new temp directory $mkdir temp
+#   copy the following files into this directory
+#     this script file
+#     your tar file
+#     the input file sssp.mips from project 2
+#     the output file sssp.out provided in the assignment 3 tarball
+#   if you haven't already cd into the temp directory
+#   change the 'yourNetID' string below to match your tar filename
+#   Note:  a quirk of bash scripts is no spaces can be in assignment statements
+#   execute the script
+#   if you get a file error you may have to $chmod +x submit_test
+#   You should see the result of size check, untar, make, execute, and compare
+#   with final message of: 
+#   "Files sssp.out and temp.out are identical"
+filename=yourNetID_project3.tgz
+mysize=$(find "$filename" -printf "%s")
+echo "${filename} size is ${mysize} bytes."
+if [ ${mysize} -gt 9000 ]; then
+    echo "WARNING: .tgz file is large, should include only *.h *.cpp and Makefile"
+	echo "Please read assignment submission instructions and double check."
+fi
+tar xzvf $filename
+if [ -e CPU.cpp ]; then
+    echo "untar successful, checking source for name and netID"
+	head -2 CPU.cpp | tail -1 #this outputs the name line of CPU.cpp
+	head -2 Stats.cpp | tail -1 #same for Stats.cpp
+    make
+        if [ -e ./simulator ]; then
+	    ./simulator sssp.mips | tee temp.out
+            #tee redirects output to screen and file
+            diff -w -s -y sssp.out temp.out
+	else
+            echo "ERROR:  Did not compile, no ./simulator found"
+        fi
+else
+    echo "ERROR: tar issue, no CPU.cpp found"
+fi
