@@ -104,6 +104,7 @@ void Stats::registerSrc(int r) { // r == the register being read
     return;
   for(int i = EXE1; i < WB; i++){
     if(r == resultReg[i]){
+      // Ready calculates how many bubbles you need in the pipe for the instr to be ready
       int ready = WB - i;
 
       while(ready > 0){
