@@ -99,6 +99,20 @@ void Stats::registerSrc(int r) { // r == the register being read
       }
     }
   }
+  /* From Hinkle
+  if(r == 0)
+    return;
+  for(int i = EXE1; i < WB; i++){
+    if(r == resultReg[i]){
+      int ready = WB - i;
+
+      while(ready > 0){
+        bubble();
+        ready--;
+      }
+    }
+  }
+  */
 }
 
 void Stats::registerDest(int r) { // r == the register to be written to
