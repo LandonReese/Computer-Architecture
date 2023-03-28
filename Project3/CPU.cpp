@@ -44,6 +44,9 @@ void CPU::run() {
     writeback();
 
     D(printRegFile());
+
+    stats.clock(); // Place here after writeback stats.clock(IF1);
+    // to ensure you don't need to call clock after every function
   }
 }
 
@@ -116,6 +119,7 @@ void CPU::decode() {
                    break; // use prototype above, not the greensheet
         case 0x08: D(cout << "jr " << regNames[rs]);
                    pc = regFile[rs];            stats.registerSrc(rs);
+                   stats.flush(ID - IF1);
                    break;
         case 0x10: D(cout << "mfhi " << regNames[rd]);
         // Note that mfhi and mflo
@@ -175,6 +179,7 @@ void CPU::decode() {
       break;
     case 0x02: D(cout << "j " << hex << ((pc & 0xf0000000) | addr << 2)); // P1: pc + 4
                pc = ((pc & 0xf0000000) | addr << 2);
+               stats.flush(ID - IF1);
                break;
     case 0x03: D(cout << "jal " << hex << ((pc & 0xf0000000) | addr << 2)); // P1: pc + 4
                writeDest = true; 
@@ -183,17 +188,25 @@ void CPU::decode() {
                aluSrc1 = pc;                    
                aluSrc2 = regFile[REG_ZERO];     stats.registerSrc(REG_ZERO);// always reads zero
                pc = (pc & 0xf0000000) | addr << 2;
+               stats.flush(ID - IF1);
                break;
     case 0x04: D(cout << "beq " << regNames[rs] << ", " << regNames[rt] << ", " << pc + (simm << 2));
                /* Need to check before if */    stats.registerSrc(rs);
-               /* statement is called.    */    stats.registerSrc(rt);   
+               /* statement is called.    */    stats.registerSrc(rt); 
+               stats.countBranch();  
                if(regFile[rs] == regFile[rt]){
                  pc = pc + (simm << 2);
+                 stats.countTaken();
+                 stats.flush(ID - IF1);
                }
                break;  // read the handout carefully, update PC directly here as in jal example
     case 0x05: D(cout << "bne " << regNames[rs] << ", " << regNames[rt] << ", " << pc + (simm << 2));
+    stats.registerSrc(rs); stats.registerSrc(rt);
+    stats.countBranch();
                if(regFile[rs] != regFile[rt]){
+                 stats.countTaken();
                  pc = pc + (simm << 2);
+                 stats.flush(ID - IF1);
                }
                break;  // same comment as beq
     case 0x09: D(cout << "addiu " << regNames[rt] << ", " << regNames[rs] << ", " << dec << simm);
@@ -222,8 +235,10 @@ void CPU::decode() {
                switch(addr & 0xf) {
                  case 0x0: cout << endl; break;
                  case 0x1: cout << " " << (signed)regFile[rs];
+                           stats.registerSrc(rs);
                            break;
                  case 0x5: cout << endl << "? "; cin >> regFile[rt];
+                           stats.registerSrc(rt);
                            break;
                  case 0xa: stop = true; break;
                  default: cerr << "unimplemented trap: pc = 0x" << hex << pc - 4 << endl;
@@ -237,14 +252,16 @@ void CPU::decode() {
                aluOp = ADD;
                aluSrc1 = simm;
                aluSrc2 = regFile[rs];     stats.registerSrc(rs);
+               stats.countMemOp();
 
                break;  // do not interact with memory here - setup control signals for mem()
     case 0x2b: D(cout << "sw " << regNames[rt] << ", " << dec << simm << "(" << regNames[rs] << ")");
                opIsStore = true;
                writeDest = true;
-               storeData = regFile[rt];
+               storeData = regFile[rt];   stats.registerSrc(rt); //maybe switch the order of these stats.registerSrc() commands if it doesn't test correctly
                aluSrc1 = simm;
                aluSrc2 = regFile[rs];     stats.registerSrc(rs);
+               stats.countMemOp();
                break;  // same comment as lw
     default: cerr << "unimplemented instruction: pc = 0x" << hex << pc - 4 << endl;
   }
