@@ -27,6 +27,8 @@ class Stats {
     int taken;
 
     int resultReg[PIPESTAGES];
+    int resultStage[PIPESTAGES];  // Advance every time you advance resultReg[]
+    int RAWhazards[PIPESTAGES];    // Tracks RAW control hazards
 
   public:
     Stats();

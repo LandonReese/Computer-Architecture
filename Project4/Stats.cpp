@@ -70,6 +70,7 @@ Stats::Stats() {
 
   for(int i = IF1; i < PIPESTAGES; i++) {
     resultReg[i] = -1;
+    resultStage[i] = -1;
   }
 }
 
@@ -80,9 +81,11 @@ void Stats::clock() {
   // advance all stages in pipeline
   for(int i = WB; i > IF1; i--) {
     resultReg[i] = resultReg[i-1];
+    resultStage[i] = resultStage[i-1];
   }
   // inject a NOP in pipestage IF1
   resultReg[IF1] = -1;
+  resultStage[IF1] = -1;
 }
 
 void Stats::registerSrc(int r, PIPESTAGE needed) { // r == the register being read
@@ -93,7 +96,8 @@ void Stats::registerSrc(int r, PIPESTAGE needed) { // r == the register being re
     if(resultReg[i] == r && r != 0){ //checks to see if the register is being used for instructions in EXE1 -> WB
       // If it is being used, insert the appropriate amount of bubbles to get the instruction out of the pipe
       // Update totalBubbles to be representational of the amount of bubbles needed with forwarding paths
-      totalBubbles = (WB - i) - (needed - ID); // Updated this code for Project4 so far
+      totalBubbles = (resultStage[i] - i) - (needed - ID); // Update RAW Hazards if there is a conflict
+      RAWhazards[i]++; //Increment hazards
       for(int j = 0; j < totalBubbles; j++){
         totalBubbles--;
         bubble();
@@ -118,8 +122,9 @@ void Stats::registerSrc(int r, PIPESTAGE needed) { // r == the register being re
 }
 
 void Stats::registerDest(int r, PIPESTAGE valid) { // r == the register to be written to
-
+  
   resultReg[ID] = r;
+  resultStage[ID] = valid;
 }
 
 void Stats::flush(int count) { // count == how many ops to flush
@@ -152,8 +157,10 @@ void Stats::bubble() {
   // Cycle backwards through the pipe, advancing until instruction in ID can begin
   for(int i = WB; i > EXE1; i--){ // Advances through the pipe backwards, updating each stage.
     resultReg[i] = resultReg[i-1];
+    resultStage[i] = resultStage[i-1];
   }
   resultReg[EXE1] = -1; //Because a bubble is necessary, add a NOP
+  resultStage[EXE1] = -1;
 }
 
 void Stats::showPipe() {
