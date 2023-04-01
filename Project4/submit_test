@@ -16,7 +16,7 @@
 #   You should see the result of size check, untar, make, execute, and compare
 #   with final message of: 
 #   "Files sssp.out and temp.out are identical"
-filename=ljr69_project3.tgz
+filename=ljr69_project4.tgz
 mysize=$(find "$filename" -printf "%s")
 echo "${filename} size is ${mysize} bytes."
 if [ ${mysize} -gt 9000 ]; then
