@@ -105,74 +105,74 @@ void CPU::decode() {
       switch(funct) {
         case 0x00: D(cout << "sll " << regNames[rd] << ", " << regNames[rs] << ", " << dec << shamt);
                    writeDest = true;      
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = rd;                stats.registerDest(rd, PIPESTAGE::MEM1);
                    aluOp = SHF_L;
-                   aluSrc1 = regFile[rs];       stats.registerSrc(rs);
+                   aluSrc1 = regFile[rs];       stats.registerSrc(rs, PIPESTAGE::EXE1);
                    aluSrc2 = shamt;          
                    break; // use prototype above, not the greensheet
         case 0x03: D(cout << "sra " << regNames[rd] << ", " << regNames[rs] << ", " << dec << shamt);
                    writeDest = true;      
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = rd;                stats.registerDest(rd, PIPESTAGE::MEM1);
                    aluOp = SHF_R;
-                   aluSrc1 = regFile[rs];       stats.registerSrc(rs);
+                   aluSrc1 = regFile[rs];       stats.registerSrc(rs, PIPESTAGE::EXE1);
                    aluSrc2 = shamt;
                    break; // use prototype above, not the greensheet
         case 0x08: D(cout << "jr " << regNames[rs]);
-                   pc = regFile[rs];            stats.registerSrc(rs);
+                   pc = regFile[rs];            stats.registerSrc(rs, PIPESTAGE::ID);
                    stats.flush(ID - IF1);
                    break;
         case 0x10: D(cout << "mfhi " << regNames[rd]);
         // Note that mfhi and mflo
         // read the hi/lo registers, and mult and div write them
                    writeDest = true;
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = rd;                stats.registerDest(rd, PIPESTAGE::MEM1);
                    aluOp = ADD;
-                   aluSrc1 = hi;                stats.registerSrc(REG_HILO);
-                   aluSrc2 = regFile[REG_ZERO]; stats.registerSrc(REG_ZERO);
+                   aluSrc1 = hi;                stats.registerSrc(REG_HILO, PIPESTAGE::EXE1);
+                   aluSrc2 = regFile[REG_ZERO]; //stats.registerSrc(REG_ZERO);
                    break;
         case 0x12: D(cout << "mflo " << regNames[rd]);
                    writeDest = true;
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = rd;                stats.registerDest(rd, PIPESTAGE::MEM1);
                    aluOp = ADD;
-                   aluSrc1 = lo;                stats.registerSrc(REG_HILO);
-                   aluSrc2 = regFile[REG_ZERO]; stats.registerSrc(REG_ZERO);
+                   aluSrc1 = lo;                stats.registerSrc(REG_HILO, PIPESTAGE::EXE1);
+                   aluSrc2 = regFile[REG_ZERO]; //stats.registerSrc(REG_ZERO);
                    break;
         case 0x18: D(cout << "mult " << regNames[rs] << ", " << regNames[rt]);
                    writeDest = true;
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = REG_HILO;                stats.registerDest(REG_HILO, PIPESTAGE::WB); //FIX THIS LINE
                    aluOp = MUL;
                    opIsMultDiv = true;
-                   aluSrc1 = regFile[rs];       stats.registerSrc(rs);
-                   aluSrc2 = regFile[rt];       stats.registerSrc(rt);
+                   aluSrc1 = regFile[rs];       stats.registerSrc(rs, PIPESTAGE::EXE1);
+                   aluSrc2 = regFile[rt];       stats.registerSrc(rt, PIPESTAGE::EXE1);
                    break;
         case 0x1a: D(cout << "div " << regNames[rs] << ", " << regNames[rt]);
                    writeDest = true;
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = REG_HILO;                stats.registerDest(REG_HILO, PIPESTAGE::WB);
                    aluOp = DIV;
                    opIsMultDiv = true;
-                   aluSrc1 = regFile[rs];       stats.registerSrc(rs);
-                   aluSrc2 = regFile[rt];       stats.registerSrc(rt);
+                   aluSrc1 = regFile[rs];       stats.registerSrc(rs, PIPESTAGE::EXE1);
+                   aluSrc2 = regFile[rt];       stats.registerSrc(rt, PIPESTAGE::EXE1);
                    break;
         case 0x21: D(cout << "addu " << regNames[rd] << ", " << regNames[rs] << ", " << regNames[rt]);
                    writeDest = true;
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = rd;                stats.registerDest(rd, PIPESTAGE::MEM1);
                    aluOp = ADD;
-                   aluSrc1 = regFile[rs];       stats.registerSrc(rs);
-                   aluSrc2 = regFile[rt];       stats.registerSrc(rt);
+                   aluSrc1 = regFile[rs];       stats.registerSrc(rs, PIPESTAGE::EXE1);
+                   aluSrc2 = regFile[rt];       stats.registerSrc(rt, PIPESTAGE::EXE1);
                    break;
         case 0x23: D(cout << "subu " << regNames[rd] << ", " << regNames[rs] << ", " << regNames[rt]);
                    writeDest = true;
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = rd;                stats.registerDest(rd, PIPESTAGE::MEM1);
                    aluOp = ADD;
-                   aluSrc1 = regFile[rs];       stats.registerSrc(rs);
-                   aluSrc2 = -(regFile[rt]);    stats.registerSrc(rt);
+                   aluSrc1 = regFile[rs];       stats.registerSrc(rs, PIPESTAGE::EXE1);
+                   aluSrc2 = -(regFile[rt]);    stats.registerSrc(rt, PIPESTAGE::EXE1);
                    break; //hint: subtract is the same as adding a negative
         case 0x2a: D(cout << "slt " << regNames[rd] << ", " << regNames[rs] << ", " << regNames[rt]);
                    writeDest = true;
-                   destReg = rd;                stats.registerDest(rd);
+                   destReg = rd;                stats.registerDest(rd, PIPESTAGE::MEM1);
                    aluOp = CMP_LT;
-                   aluSrc1 = regFile[rs];       stats.registerSrc(rs);
-                   aluSrc2 = regFile[rt];       stats.registerSrc(rt);
+                   aluSrc1 = regFile[rs];       stats.registerSrc(rs, PIPESTAGE::EXE1);
+                   aluSrc2 = regFile[rt];       stats.registerSrc(rt, PIPESTAGE::EXE1);
                    break;
         default: cerr << "unimplemented instruction: pc = 0x" << hex << pc - 4 << endl;
       }
@@ -183,16 +183,16 @@ void CPU::decode() {
                break;
     case 0x03: D(cout << "jal " << hex << ((pc & 0xf0000000) | addr << 2)); // P1: pc + 4
                writeDest = true; 
-               destReg = REG_RA;                stats.registerDest(REG_RA); // writes PC+4 to $ra
+               destReg = REG_RA;                stats.registerDest(REG_RA, PIPESTAGE::EXE1); // writes PC+4 to $ra
                aluOp = ADD; //pc needs to pass through the ALU unchanged
                aluSrc1 = pc;                    
-               aluSrc2 = regFile[REG_ZERO];     stats.registerSrc(REG_ZERO);// always reads zero
+               aluSrc2 = regFile[REG_ZERO];     //stats.registerSrc(REG_ZERO, PIPESTAGE::);// always reads zero
                pc = (pc & 0xf0000000) | addr << 2;
                stats.flush(ID - IF1);
                break;
     case 0x04: D(cout << "beq " << regNames[rs] << ", " << regNames[rt] << ", " << pc + (simm << 2));
-               /* Need to check before if */    stats.registerSrc(rs);
-               /* statement is called.    */    stats.registerSrc(rt); 
+               /* Need to check before if */    stats.registerSrc(rs, PIPESTAGE::ID);
+               /* statement is called.    */    stats.registerSrc(rt, PIPESTAGE::ID); 
                stats.countBranch();  
                if(regFile[rs] == regFile[rt]){
                  pc = pc + (simm << 2);
@@ -201,7 +201,8 @@ void CPU::decode() {
                }
                break;  // read the handout carefully, update PC directly here as in jal example
     case 0x05: D(cout << "bne " << regNames[rs] << ", " << regNames[rt] << ", " << pc + (simm << 2));
-    stats.registerSrc(rs); stats.registerSrc(rt);
+                                                stats.registerSrc(rs, PIPESTAGE::ID); 
+                                                stats.registerSrc(rt, PIPESTAGE::ID);
     stats.countBranch();
                if(regFile[rs] != regFile[rt]){
                  stats.countTaken();
@@ -211,22 +212,22 @@ void CPU::decode() {
                break;  // same comment as beq
     case 0x09: D(cout << "addiu " << regNames[rt] << ", " << regNames[rs] << ", " << dec << simm);
                writeDest = true; 
-               destReg = rt;                    stats.registerDest(rt);
+               destReg = rt;                    stats.registerDest(rt, PIPESTAGE::MEM1);
                aluOp = ADD;
-               aluSrc1 = regFile[rs];           stats.registerSrc(rs);
+               aluSrc1 = regFile[rs];           stats.registerSrc(rs, PIPESTAGE::EXE1);
                aluSrc2 = simm;
                break;
     case 0x0c: D(cout << "andi " << regNames[rt] << ", " << regNames[rs] << ", " << dec << uimm);
                writeDest = true;
-               destReg = rt;                    stats.registerDest(rt);
+               destReg = rt;                    stats.registerDest(rt, PIPESTAGE::MEM1);
                aluOp = AND;
-               aluSrc1 = regFile[rs];           stats.registerSrc(rs);
+               aluSrc1 = regFile[rs];           stats.registerSrc(rs, PIPESTAGE::EXE1);
                aluSrc2 = uimm;
                break;
     case 0x0f: D(cout << "lui " << regNames[rt] << ", " << dec << simm);
                //op is load bool needs to be true
                writeDest = true;
-               destReg = rt;                    stats.registerDest(rt);
+               destReg = rt;                    stats.registerDest(rt, PIPESTAGE::MEM1);
                aluOp = SHF_L; //need to shift left by 16
                aluSrc1 = simm; //simm needs to shift simm bits to upper part of word
                aluSrc2 = 16;  //fulfills the left shift of 16bits
@@ -235,10 +236,10 @@ void CPU::decode() {
                switch(addr & 0xf) {
                  case 0x0: cout << endl; break;
                  case 0x1: cout << " " << (signed)regFile[rs];
-                           stats.registerSrc(rs);
+                           stats.registerSrc(rs, PIPESTAGE::EXE1);
                            break;
                  case 0x5: cout << endl << "? "; cin >> regFile[rt];
-                           stats.registerSrc(rt);
+                           stats.registerSrc(rt, PIPESTAGE::MEM1);
                            break;
                  case 0xa: stop = true; break;
                  default: cerr << "unimplemented trap: pc = 0x" << hex << pc - 4 << endl;
@@ -248,19 +249,19 @@ void CPU::decode() {
     case 0x23: D(cout << "lw " << regNames[rt] << ", " << dec << simm << "(" << regNames[rs] << ")");
                opIsLoad = true;
                writeDest = true;
-               destReg = rt;              stats.registerDest(rt);
+               destReg = rt;              stats.registerDest(rt, PIPESTAGE::WB);
                aluOp = ADD;
                aluSrc1 = simm;
-               aluSrc2 = regFile[rs];     stats.registerSrc(rs);
+               aluSrc2 = regFile[rs];     stats.registerSrc(rs, PIPESTAGE::EXE1);
                stats.countMemOp();
 
                break;  // do not interact with memory here - setup control signals for mem()
     case 0x2b: D(cout << "sw " << regNames[rt] << ", " << dec << simm << "(" << regNames[rs] << ")");
                opIsStore = true;
                writeDest = true;
-               storeData = regFile[rt];   stats.registerSrc(rt); //maybe switch the order of these stats.registerSrc() commands if it doesn't test correctly
+               storeData = regFile[rt];   stats.registerSrc(rt, PIPESTAGE::MEM1); //maybe switch the order of these stats.registerSrc() commands if it doesn't test correctly
                aluSrc1 = simm;
-               aluSrc2 = regFile[rs];     stats.registerSrc(rs);
+               aluSrc2 = regFile[rs];     stats.registerSrc(rs, PIPESTAGE::EXE1);
                stats.countMemOp();
                break;  // same comment as lw
     default: cerr << "unimplemented instruction: pc = 0x" << hex << pc - 4 << endl;

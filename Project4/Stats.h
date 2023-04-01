@@ -35,8 +35,8 @@ class Stats {
 
     void flush(int count);
 
-    void registerSrc(int r);
-    void registerDest(int r);
+    void registerSrc(int r, PIPESTAGE needed);
+    void registerDest(int r, PIPESTAGE valid);
 
     void countMemOp() { memops++; }
     void countBranch() { branches++; }

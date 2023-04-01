@@ -92,6 +92,7 @@ void Stats::registerSrc(int r, PIPESTAGE needed) { // r == the register being re
     //registerSrc check for regZero, r != 0
     if(resultReg[i] == r && r != 0){ //checks to see if the register is being used for instructions in EXE1 -> WB
       // If it is being used, insert the appropriate amount of bubbles to get the instruction out of the pipe
+      // Update totalBubbles to be representational of the amount of bubbles needed with forwarding paths
       totalBubbles = WB - i;
       for(int j = 0; j < totalBubbles; j++){
         totalBubbles--;
@@ -134,6 +135,7 @@ void Stats::flush(int count) { // count == how many ops to flush
   while(count > 0){
     clock();        // Everytime a clock cycle is advanced,
     flushes++;      // a flush is added.
+    count--;
   }
 }
 
