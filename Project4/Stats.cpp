@@ -122,7 +122,6 @@ void Stats::registerSrc(int r, PIPESTAGE needed) { // r == the register being re
 }
 
 void Stats::registerDest(int r, PIPESTAGE valid) { // r == the register to be written to
-  
   resultReg[ID] = r;
   resultStage[ID] = valid;
 }
