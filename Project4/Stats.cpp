@@ -93,7 +93,7 @@ void Stats::registerSrc(int r, PIPESTAGE needed) { // r == the register being re
     if(resultReg[i] == r && r != 0){ //checks to see if the register is being used for instructions in EXE1 -> WB
       // If it is being used, insert the appropriate amount of bubbles to get the instruction out of the pipe
       // Update totalBubbles to be representational of the amount of bubbles needed with forwarding paths
-      totalBubbles = WB - i;
+      totalBubbles = (WB - i) - (needed - ID); // Updated this code for Project4 so far
       for(int j = 0; j < totalBubbles; j++){
         totalBubbles--;
         bubble();
@@ -118,6 +118,7 @@ void Stats::registerSrc(int r, PIPESTAGE needed) { // r == the register being re
 }
 
 void Stats::registerDest(int r, PIPESTAGE valid) { // r == the register to be written to
+
   resultReg[ID] = r;
 }
 
