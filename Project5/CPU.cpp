@@ -14,9 +14,9 @@
 #include "Stats.h"
 
 /*********************************
-* You will also need to modify CPU.cpp to call both CacheStats and Stats class functions 
-* appropriately to model cache behavior and resulting pipeline stalls.  You’ll also need to change 
-* CPU::printFinalStats() to match my expected output format (see below).
+ * You will also need to modify CPU.cpp to call both CacheStats and Stats class functions 
+ * appropriately to model cache behavior and resulting pipeline stalls.  You’ll also need to change 
+ * CPU::printFinalStats() to match my expected output format (see below).
 *********************************/
 
 Stats stats = Stats();
