@@ -8,9 +8,13 @@
  ******************************/
 
 /*******************************
-* A CacheStats.h class specification file, to which you’ll need to add member variables 
-* A CacheStats.cpp class implementation file, which you should enhance with code to model the 
-* described cache and count accesses, misses, and writebacks
+ * A CacheStats.h class specification file, to which you’ll need to add member variables 
+ * A CacheStats.cpp class implementation file, which you should enhance with code to model the 
+ * described cache and count accesses, misses, and writebacks
+ * 
+ * Inside your Stats class, add a new function similar to the bubble() and flush() functions.  This stall() 
+ * function should stall the entire pipeline for a specified number of cycles.  The Stats class should track the 
+ * total number of stall cycles that occur during program execution. 
 ********************************/
 
 #ifndef __CACHE_STATS_H

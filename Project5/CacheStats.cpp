@@ -11,9 +11,21 @@
  ******************************/
 
 /*******************************
-* A CacheStats.h class specification file, to which you’ll need to add member variables 
-* A CacheStats.cpp class implementation file, which you should enhance with code to model the 
-* described cache and count accesses, misses, and writebacks
+ * A CacheStats.h class specification file, to which you’ll need to add member variables 
+ * A CacheStats.cpp class implementation file, which you should enhance with code to model the 
+ * described cache and count accesses, misses, and writebacks
+ * 
+ * Every time an access is made to the cache model, the cache model should return the number of cycles that 
+ * the processor must stall in order for that access to complete.  It takes 0 cycles to do a lookup or to hit in the 
+ * cache (i.e., data that is hit will be returned or written immediately).  A read access to the next level of the 
+ * memory hierarchy (e.g., main memory) has a latency of 30 cycles, and a write access has a latency of 10 
+ * cycles.  Note that an access resulting in the replacement of a dirty line requires both a main memory write 
+ * (to write back the dirty block) and a read (to fetch the new block) consecutively.  Because the cache has no 
+ * write buffer, all stores must stall until the write is complete.
+ * 
+ * Inside your Stats class, add a new function similar to the bubble() and flush() functions.  This stall() 
+ * function should stall the entire pipeline for a specified number of cycles.  The Stats class should track the 
+ * total number of stall cycles that occur during program execution. 
 ********************************/
 
 
