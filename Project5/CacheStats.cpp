@@ -180,8 +180,8 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
         return READ_LATENCY;
       }
     }
-    return LOOKUP_LATENCY;
   }
+  return LOOKUP_LATENCY;
 }
 
 void CacheStats::printFinalStats() {
