@@ -154,7 +154,11 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
       cacheTags[i][roundRobin[i]] = tag;
       
       // Increment Hits
-      if(type == LOAD)? loads++ : stores++;
+      if(type == LOAD){
+        loads++; 
+      } else { 
+        stores++;
+      }
 
       // Increment misses
       if(type = LOAD){
