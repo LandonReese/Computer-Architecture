@@ -68,22 +68,25 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
   }
 
   /* TODO: your code to compute number of stall cycles here */
-  bool hit = false; // Initialized as false, until proven to be a hit
 
   /******
    * Parse Address into Index and Tag
    * Address bits:
-   * 0, 1:    Byte Offset (2 bits)
-   * 2, 3, 4: Word Offset (3 bits)
-   * 5, n:    Index (x bits)
-   * X, Y, Z: Tag (x bits)
+   * 0, 1:          Byte Offset (2 bits)
+   * 2, 3, 4:       Word Offset (3 bits)
+   * 5, 6, 7, 8:    Index (4 bits)
+   * 9 - 31:        Tag (23 bits)
+   * data in block sizes of 8 words means index = 4 bits
+   * # of blocks = # of sets * # of ways
   *******/
   
-  int byteOffset = (addr >> 8);
-  int wordOffset = (addr >> 8);
+  // int byteOffset = (addr >> 2) & 0x3;
+  // int wordOffset = (addr >> 3) & 0x7;
 
-  int index = (addr >> 8);
-  int tag = (addr >> 50000)
+  int index = (addr >> 5) & 0x7;
+  int tag = (addr >> 8);
+
+  bool addWriteLatency = false;
 
   /************
    * Step 1: Valid CPU Request
@@ -98,15 +101,13 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
    * then:
    * cache = hit, mark cache as ready
   *************/
-  
-  /************
+ /************
    * Step 2: Cache Miss and Old Block is Clean
    * 
    * Allocate
    * Read new block from Memory
    * (Refresh/Stall if memory is not ready)
   *************/
-
   /************
    * Step 3: Cache Miss and Old Block is Dirty
    * 
@@ -115,7 +116,6 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
    * Stall if Memory is not ready
    * (If it takes 10 clock cycles  to write back to memory, add 10)
   *************/
-
   /************
    * Step 4: Return proper value of stall cycles
    * 
@@ -124,7 +124,59 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
    * #define WRITE_MEM_LATENCY 10
   *************/
 
+  for(int i = 0; i < SETS; i++){ // SETS = 8
+    // Compare the index to each set 
+    
+    // If there is a cache Hit
+    if(i == index){
+      // If the index matches
+      for(int j = 0; j < WAYS; j++){ // WAYS = 4
+        // If tag matches and is valid
+        if(tag == cacheTags[i][j]){
+          if(cacheValidBits[i][j]){
+            // Check for store to update dirty bit
+            if(type == STORE){
+              cacheDirtyBits[i][j] == true;
+              addWriteLatency = true;
+            }
+          }
+        }
+      }
 
+      // If there is a dirty bit, writeback to memory
+      if(cacheDirtyBits[i][roundRobin[i]]){
+        writebacks++;
+        return WRITE_LATENCY;
+      }
+
+      // Set Valid bit, and Set Tag
+      cacheValidBits[i][roundRobin[i]] = true;
+      cacheTags[i][roundRobin[i]] = tag;
+      
+      // Increment Hits
+      if(type == LOAD)? loads++ : stores++;
+
+      // Increment misses
+      if(type = LOAD){
+        cacheDirtyBits[i][roundRobin[i]] = false;
+        load_misses++;
+      } else {
+        cacheDirtyBits[i][roundRobin[i]] = true;
+        store_misses++;
+      }
+
+      // Cycle Round Robin bit
+      roundRobin[i]++;
+      roundRobin[i] = roundRobin[i] % 4;
+
+      // If there was a writeback, ensure the proper stall time is allocated
+      if(addWriteLatency){
+        return READ_LATENCY + WRITE_LATENCY;
+      } else {
+        return READ_LATENCY;
+      }
+    }
+  }
 }
 
 void CacheStats::printFinalStats() {
@@ -144,5 +196,12 @@ void CacheStats::printFinalStats() {
 }
 
 void CacheStats::drainFinalWritebacks(){
-
+  for(int i = 0; i < SETS; i++){
+    for(int j = 0; j < WAYS; j++){
+      // For each dirty bit found, increment writebacks
+      if(cacheDirtyBits[i][j]){
+        writebacks++;
+      }
+    }
+  }
 }

@@ -29,6 +29,7 @@ class Stats {
   private:
     long long cycles;
     int flushes;
+    int stalls;
     int bubbles;
 
     int memops;
@@ -45,6 +46,7 @@ class Stats {
     void clock();
 
     void flush(int count);
+    void stall(int count);
 
     void registerSrc(int r, PIPESTAGE needed);
     void registerDest(int r, PIPESTAGE valid);
@@ -58,6 +60,7 @@ class Stats {
     // getters
     long long getCycles() { return cycles; }
     int getFlushes() { return flushes; }
+    int getFlushes() { return stalls; }
     int getBubbles() { return bubbles; }
     int getMemOps() { return memops; }
     int getBranches() { return branches; }

@@ -23,6 +23,7 @@
 Stats::Stats() {
   cycles = PIPESTAGES - 1; // pipeline startup cost
   flushes = 0;
+  stalls = 0;
   bubbles = 0;
 
   memops = 0;
@@ -101,6 +102,14 @@ void Stats::flush(int count) { // count == how many ops to flush
   while(count > 0){
     clock();        // Everytime a clock cycle is advanced,
     flushes++;      // a flush is added.
+    count--;
+  }
+}
+
+void stall(int count){
+  while(count > 0){
+    clock();
+    stalls++;
     count--;
   }
 }

@@ -9,6 +9,8 @@
 #include "Memory.h"
 #include "ALU.h"
 #include "Debug.h"
+#include "Stats.h"
+#include "CacheStats.h"
 using namespace std;
 /*********************************
  * You will also need to modify CPU.h to instantiate a CacheStats object, and CPU.cpp to call both CacheStats and Stats class functions 
@@ -17,6 +19,9 @@ using namespace std;
 *********************************/
 class CPU {
   private:
+    Stats stats;
+    CacheStats cStats;
+
     static const int NREGS = 32;
     static const string regNames[];
 

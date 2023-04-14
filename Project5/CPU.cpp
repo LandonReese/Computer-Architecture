@@ -20,6 +20,7 @@
 *********************************/
 
 Stats stats = Stats();
+CacheStats cStats = CacheStats();
 
 const string CPU::regNames[] = {"$zero","$at","$v0","$v1","$a0","$a1","$a2","$a3",
                                 "$t0","$t1","$t2","$t3","$t4","$t5","$t6","$t7",
@@ -260,7 +261,7 @@ void CPU::decode() {
                aluSrc1 = simm;
                aluSrc2 = regFile[rs];     stats.registerSrc(rs, PIPESTAGE::EXE1);
                stats.countMemOp();
-
+               stats.stall(cStats.access((simm + regFile[rs]), LOAD));
                break;  // do not interact with memory here - setup control signals for mem()
     case 0x2b: D(cout << "sw " << regNames[rt] << ", " << dec << simm << "(" << regNames[rs] << ")");
                opIsStore = true;
@@ -269,6 +270,7 @@ void CPU::decode() {
                aluSrc1 = simm;
                aluSrc2 = regFile[rs];     stats.registerSrc(rs, PIPESTAGE::EXE1);
                stats.countMemOp();
+               stats.stall(cStats.access((simm + regFile[rs]), STORE));
                break;  // same comment as lw
     default: cerr << "unimplemented instruction: pc = 0x" << hex << pc - 4 << endl;
   }
@@ -315,5 +317,21 @@ void CPU::printRegFile() {
 
 void CPU::printFinalStats() {
   cout << "Program finished at pc = 0x" << hex << pc << "  ("
-       << dec << instructions << " instructions executed)" << endl;
+       << dec << instructions << " instructions executed)" << endl << endl;
+  cout << "Cycles: " << stats.getCycles() << endl;
+  cout << "CPI: " << fixed << setprecision(2) << (stats.getCycles()/instructions) << endl;
+  cout << endl;
+  cout << "Bubbles: " << stats.getBubbles() << endl;
+  cout << "Flushes: " << stats.getFlushes() << endl;
+  cout << "Stalls: "  << stats.getStalls()  << endl;
+  cout << endl;
+  cStats.printFinalStats();
+  /*******************************
+   * The exact number of clock cycles it would take to execute the program on this CPU
+   * The CPI(cycle count / instruction count)
+   * The number of bubble cycles injected due to data dependencies(unchanged from Proj. 4)
+   * The number of flush cycles in the shadows of jumps and taken branches(also unchanged)
+   * The number of stall cycles due to cache/memory latency
+   * The data cache statistics reported by the cache model
+  *******************************/
 }
