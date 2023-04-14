@@ -136,7 +136,7 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
           if(cacheValidBits[i][j]){
             // Check for store to update dirty bit
             if(type == STORE){
-              cacheDirtyBits[i][j] == true;
+              cacheDirtyBits[i][j] = true;
               addWriteLatency = true;
             }
           }
@@ -161,7 +161,7 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
       }
 
       // Increment misses
-      if(type = LOAD){
+      if(type == LOAD){
         cacheDirtyBits[i][roundRobin[i]] = false;
         load_misses++;
       } else {
@@ -180,6 +180,7 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
         return READ_LATENCY;
       }
     }
+    return LOOKUP_LATENCY;
   }
 }
 
