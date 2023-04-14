@@ -54,19 +54,82 @@ CacheStats::CacheStats() {
   writebacks = 0;
 
   /* TODO: your code to initialize your datastructures here */
+  uint32_t  cacheTags[SETS][WAYS] = {0};     //tags
+  uint32_t roundRobin[SETS]       = {0};     //round robin bits 0-3 (Always % 4 for )
+  bool cacheDirtyBits[SETS][WAYS] = {CLEAN}; //dirty bit either clean = 0, or dirty = 1
+  bool cacheValidBits[SETS][WAYS] = {VALID}; //valid bit either Invalid = 0 or Valid = 1
 }
 
+// 32 bit address
+// enum ACCESS_TYPE { LOAD, STORE };
 int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
   if(!CACHE_EN) { // full latency if the cache is disabled
     return (type == LOAD) ? READ_LATENCY : WRITE_LATENCY;
   }
 
   /* TODO: your code to compute number of stall cycles here */
+  bool hit = false; // Initialized as false, until proven to be a hit
+
+  /******
+   * Parse Address into Index and Tag
+   * Address bits:
+   * 0, 1:    Byte Offset (2 bits)
+   * 2, 3, 4: Word Offset (3 bits)
+   * 5, n:    Index (x bits)
+   * X, Y, Z: Tag (x bits)
+  *******/
+  
+  int byteOffset = (addr >> 8);
+  int wordOffset = (addr >> 8);
+
+  int index = (addr >> 8);
+  int tag = (addr >> 50000)
+
+  /************
+   * Step 1: Valid CPU Request
+   * 
+   * If (Valid && Hit){
+   *  Set Valid
+   *  Set Tag
+   *  if(Write == true){
+   *    setDirty = true;
+   *  }
+   * }
+   * then:
+   * cache = hit, mark cache as ready
+  *************/
+  
+  /************
+   * Step 2: Cache Miss and Old Block is Clean
+   * 
+   * Allocate
+   * Read new block from Memory
+   * (Refresh/Stall if memory is not ready)
+  *************/
+
+  /************
+   * Step 3: Cache Miss and Old Block is Dirty
+   * 
+   * Write-Back
+   * Write Old Block to Memory
+   * Stall if Memory is not ready
+   * (If it takes 10 clock cycles  to write back to memory, add 10)
+  *************/
+
+  /************
+   * Step 4: Return proper value of stall cycles
+   * 
+   * #define WRITE_CACHE_LATENCY 0
+   * #define READ_MEM_LATENCY 30
+   * #define WRITE_MEM_LATENCY 10
+  *************/
+
+
 }
 
 void CacheStats::printFinalStats() {
   /* TODO: your code here "drain" the cache of writebacks */
-
+  drainFinalWritebacks();
   int accesses = loads + stores;
   int misses = load_misses + store_misses;
   cout << "Accesses: " << accesses << endl;
@@ -78,4 +141,8 @@ void CacheStats::printFinalStats() {
   cout << "Writebacks: " << writebacks << endl;
   cout << "Hit Ratio: " << fixed << setprecision(1) << 100.0 * (accesses - misses) / accesses;
   cout << "%" << endl;
+}
+
+void CacheStats::drainFinalWritebacks(){
+
 }

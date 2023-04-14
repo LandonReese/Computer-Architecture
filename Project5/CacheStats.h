@@ -58,6 +58,12 @@ class CacheStats {
   private:
     /* TODO: you probably want to add some member variables here to represent
      * the parts of the cache contents you need to model! */
+    enum DIRTY_BITS { CLEAN, DIRTY };           // 0 Clean bit, 1 Dirty Bit
+    enum VALID_BITS { INVALID, VALID };         // 0 Invalid bit, 1 Valid bit
+    uint32_t  cacheTags[SETS][WAYS];  // = {0};     // Tags
+    uint32_t roundRobin[SETS];        // = {0};     // Round robin bits 0-3 (Always % 4)
+    bool cacheDirtyBits[SETS][WAYS];  // = {CLEAN}; // Dirty bit either clean, 0 or dirty, 1
+    bool cacheValidBits[SETS][WAYS];  // = {VALID}; // Valid bit either 0 or 1
 
     int loads;
     int stores;
@@ -69,6 +75,7 @@ class CacheStats {
     CacheStats();
     int access(uint32_t, ACCESS_TYPE);
     void printFinalStats();
+    void drainFinalWritebacks();
 };
 
 #endif
