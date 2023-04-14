@@ -186,6 +186,7 @@ int CacheStats::access(uint32_t addr, ACCESS_TYPE type) {
 void CacheStats::printFinalStats() {
   /* TODO: your code here "drain" the cache of writebacks */
   drainFinalWritebacks();
+  
   int accesses = loads + stores;
   int misses = load_misses + store_misses;
   cout << "Accesses: " << accesses << endl;

@@ -326,6 +326,7 @@ void CPU::printFinalStats() {
   cout << "Flushes: " << stats.getFlushes() << endl;
   cout << "Stalls: "  << stats.getStalls()  << endl;
   cout << endl;
+  
   cStats.printFinalStats();
   /*******************************
    * The exact number of clock cycles it would take to execute the program on this CPU
