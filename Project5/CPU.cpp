@@ -12,6 +12,7 @@
 
 #include "CPU.h"
 #include "Stats.h"
+#include "CacheStats.h"
 
 /*********************************
  * You will also need to modify CPU.cpp to call both CacheStats and Stats class functions 
