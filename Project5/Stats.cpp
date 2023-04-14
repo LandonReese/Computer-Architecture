@@ -106,7 +106,7 @@ void Stats::flush(int count) { // count == how many ops to flush
   }
 }
 
-void stall(int count){
+void Stats::stall(int count){
   while(count > 0){
     clock();
     stalls++;

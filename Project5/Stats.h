@@ -60,7 +60,7 @@ class Stats {
     // getters
     long long getCycles() { return cycles; }
     int getFlushes() { return flushes; }
-    int getFlushes() { return stalls; }
+    int getStalls() { return stalls; }
     int getBubbles() { return bubbles; }
     int getMemOps() { return memops; }
     int getBranches() { return branches; }
